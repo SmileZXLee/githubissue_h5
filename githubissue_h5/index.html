@@ -2,11 +2,29 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>githubissue</title>
   </head>
   <body>
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>
+  <script type="text/javascript">
+    var deviceWidth = parseInt(window.screen.width);
+    var deviceScale = deviceWidth / 640;
+    var ua = navigator.userAgent;
+    if (/Android (\d+\.\d+)/.test(ua)) {
+      var version = parseFloat(RegExp.$1);
+      if (version > 2.3) {
+        document.write('<meta name="viewport" content="width=640,initial-scale=' + deviceScale + ', minimum-scale = ' +
+          deviceScale + ', maximum-scale = ' + deviceScale + ', target-densitydpi=device-dpi">');
+      } else {
+        document.write(
+          '<meta name="viewport" content="width=640,initial-scale=0.75,maximum-scale=0.75,minimum-scale=0.75,target-densitydpi=device-dpi" />'
+        );
+      }
+    } else {
+      document.write('<meta name="viewport" content="width=640, user-scalable=no">');
+    }
+  </script>
 </html>

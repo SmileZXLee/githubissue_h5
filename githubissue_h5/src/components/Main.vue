@@ -20,8 +20,9 @@
     </div>
     <el-alert
         title="因DNS污染等因素导致经常出现无法访问https://api.github.com的问题,请您稍等几分钟后再试!"
-        type="error" v-if="showNetErr">
+        type="error" v-if="showNetErr"></el-alert>
       </el-alert>
+      <el-progress :show-text="false" :stroke-width="2" :percentage="issueLoadPercentage" v-if="issueLoadPercentage!=0&&issueLoadPercentage!=100"></el-progress>
     <el-main>
       <el-table
           border
@@ -63,7 +64,7 @@
             align="center"
             label="内容">
             <template slot-scope="scope">
-              <el-popover trigger="hover" placement="top">
+              <el-popover trigger="hover" placement="top" :disabled="scope.row.body.length==0">
                 <div v-html="scope.row.body"></div>
                 <div slot="reference" class="name-wrapper overflow-ellipsis">
                   {{scope.row.body.length?scope.row.body:'无'}}
@@ -122,7 +123,8 @@
         userName: '',
         readedList: [],
         allReaded: true,
-        allUnreaded: true
+        allUnreaded: true,
+        issueLoadPercentage: 0
       }
     },
     mounted() {
@@ -154,10 +156,12 @@
         this.$api.getRepos(this.userName)
           .then(repos => {
             this.showNetErr = false;
-            localStorage.setItem('gi_userName',this.userName)
+            localStorage.setItem('gi_userName',this.userName);
+            var totalIssueCount = 0;
             for (let i = 0; i < repos.length; i++) {
               let repo = repos[i];
               if (!repo.fork && repo.open_issues_count) {
+                totalIssueCount += repo.open_issues_count;
                 this.$api.getIssues(this.userName, repo.name)
                   .then(issues => {
                     if(issues.length){
@@ -168,6 +172,7 @@
                         issue.is_read = this.readedList.includes(issue.id);
                         this.setAllReadedStatus(issue);
                         this.allDatas.push(issue);
+                        this.issueLoadPercentage = this.allDatas.length * 1.0 / totalIssueCount * 100;
                       }
                     }
                   })
